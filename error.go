@@ -6,12 +6,6 @@ import (
 	"strings"
 )
 
-// GoPathErrorInterface 接口定义
-type GoPathErrorInterface interface {
-	Error() string
-	Init()
-}
-
 // GoPathErrorType 类型定义
 type GoPathErrorType struct {
 	baseError string // 基础错误信息
