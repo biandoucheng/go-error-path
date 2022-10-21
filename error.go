@@ -42,8 +42,6 @@ func (g *GoPathErrorType) Init(err interface{}, bserr string) {
 		p = strings.TrimLeft(p[idx:], "/") + "."
 	}
 
-	fmt.Println("pkg path >>", p)
-
 	g.pkgPath = p
 	g.baseError = bserr
 }
