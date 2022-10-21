@@ -24,8 +24,13 @@ func (g *GoPathErrorType) Error() string {
 
 // Init 初始化包路径
 func (g *GoPathErrorType) Init(err interface{}, bserr string) {
-	p := reflect.TypeOf(err).PkgPath()
-	g.pkgPath = p
+	typ := reflect.TypeOf(err)
+	if typ.Kind().String() == "ptr" {
+		g.pkgPath = typ.Elem().PkgPath()
+	} else {
+		g.pkgPath = typ.PkgPath()
+	}
+
 	g.baseError = bserr
 }
 

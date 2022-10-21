@@ -13,7 +13,7 @@ type A struct {
 }
 
 func TestPath(t *testing.T) {
-	a := A{}
+	a := &A{}
 	a.Init(a, "功能测试")
 
 	err := errors.New("执行错误")
