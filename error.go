@@ -3,6 +3,7 @@ package goerrorpath
 import (
 	"fmt"
 	"reflect"
+	"strings"
 )
 
 // GoPathErrorInterface 接口定义
@@ -24,13 +25,26 @@ func (g *GoPathErrorType) Error() string {
 
 // Init 初始化包路径
 func (g *GoPathErrorType) Init(err interface{}, bserr string) {
+	// 包路径查询
 	typ := reflect.TypeOf(err)
+	p := ""
 	if typ.Kind().String() == "ptr" {
-		g.pkgPath = typ.Elem().PkgPath()
+		p = typ.Elem().PkgPath()
 	} else {
-		g.pkgPath = typ.PkgPath()
+		p = typ.PkgPath()
 	}
 
+	// 包路径优化
+	idx := strings.Index(p, "/")
+	if idx == -1 {
+		p = ""
+	} else {
+		p = strings.TrimLeft(p[idx:], "/") + "."
+	}
+
+	fmt.Println("pkg path >>", p)
+
+	g.pkgPath = p
 	g.baseError = bserr
 }
 
@@ -40,7 +54,8 @@ func (g *GoPathErrorType) ParsePkgDwtErr(dwt string, err error) error {
 	if len(g.baseError) > 0 {
 		berr = g.baseError + " : "
 	}
-	return fmt.Errorf("%s.%s Error: %s%s ", g.pkgPath, dwt, berr, err.Error())
+
+	return fmt.Errorf("%s%s Error: %s%s ", g.pkgPath, dwt, berr, err.Error())
 }
 
 // ParseError 格式化错误
