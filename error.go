@@ -42,6 +42,10 @@ func (g *GoPathErrorType) Init(err interface{}, bserr string) {
 
 // ParseDwtErr 格式化 "做什么" 错误
 func (g *GoPathErrorType) ParsePkgDwtErr(dwt string, err error) error {
+	if err == nil {
+		return nil
+	}
+
 	berr := ""
 	if len(g.baseError) > 0 {
 		berr = g.baseError + " : "
@@ -52,6 +56,10 @@ func (g *GoPathErrorType) ParsePkgDwtErr(dwt string, err error) error {
 
 // ParseError 格式化错误
 func (g *GoPathErrorType) ParsePkgError(err error) error {
+	if err == nil {
+		return nil
+	}
+
 	berr := ""
 	if len(g.baseError) > 0 {
 		berr = g.baseError + " : "
@@ -61,6 +69,10 @@ func (g *GoPathErrorType) ParsePkgError(err error) error {
 
 // ParseNormalError 格式化常规错误
 func (g *GoPathErrorType) ParseNormalError(err error) error {
+	if err == nil {
+		return nil
+	}
+
 	berr := ""
 	if len(g.baseError) > 0 {
 		berr = g.baseError + " : "
