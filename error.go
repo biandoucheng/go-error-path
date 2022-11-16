@@ -48,10 +48,48 @@ func (g *GoPathErrorType) Init(err interface{}, bserr string) {
 	g.baseErr = errors.New(bserr)
 }
 
-// ParseNormalError 格式化常规错误
-func (g *GoPathErrorType) ParseError(err error) error {
-	if err == nil {
+// HasError 判断错误列表中是否包含非空错误
+func (g *GoPathErrorType) HasError(errs ...error) bool {
+	if len(errs) == 0 {
+		return false
+	}
+
+	for _, er := range errs {
+		if er != nil {
+			return true
+		}
+	}
+
+	return false
+}
+
+// 合并错误
+func (g *GoPathErrorType) CombineErrors(errs ...error) error {
+	if len(errs) == 0 {
 		return nil
+	}
+
+	msgs := []string{}
+	for _, err := range errs {
+		if err == nil {
+			continue
+		}
+
+		msgs = append(msgs, err.Error())
+	}
+
+	if len(msgs) == 0 {
+		return nil
+	}
+
+	return errors.New(strings.Join(msgs, "|"))
+}
+
+// ParseNormalError 格式化常规错误
+func (g *GoPathErrorType) ParseError(errs ...error) error {
+	err := g.CombineErrors(errs...)
+	if err == nil {
+		return err
 	}
 
 	berr := ""
@@ -62,9 +100,10 @@ func (g *GoPathErrorType) ParseError(err error) error {
 }
 
 // ParsePathError 格式化 "做什么" 错误
-func (g *GoPathErrorType) ParsePathError(dwt string, err error) error {
+func (g *GoPathErrorType) ParsePathError(dwt string, errs ...error) error {
+	err := g.CombineErrors(errs...)
 	if err == nil {
-		return nil
+		return err
 	}
 
 	berr := ""
