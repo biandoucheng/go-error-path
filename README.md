@@ -8,40 +8,35 @@
 ## 使用方法
 [示例代码 <https://github.com/biandoucheng/open-example/tree/main/go-error-path-example>](https://github.com/biandoucheng/open-example/tree/main/go-error-path-example)
 ```
-// 在某个包中添加 error.go 内容如下
-package pkga
+package test
 
 import (
-	gperr "github.com/biandoucheng/go-error-path"
+	"errors"
+	"fmt"
+	"testing"
+
+	goerrorpath "github.com/biandoucheng/go-error-path"
 )
 
-type PkgAErrorType struct {
-	gperr.GoPathErrorType
+type A struct {
+	goerrorpath.GoPathErrorType
 }
 
-var pkgAError *PkgAErrorType
+func TestPath(t *testing.T) {
+	a := &A{}
+	a.Init(a, "功能测试", "内部错误")
 
-func init() {
-	pkgAError = &PkgAErrorType{}
-	pkgAError.Init(pkgAError, "Wrong A")
-}
-
-// 在包内的其他文件中可直接使用 pkgAError 对应的错误信息格式化方法。如：
-package pkgb
-
-import (
-	"go-error-path-example/pkga"
-)
-
-func FuncB() error {
-	err := pkga.FuncA()
-	if err != nil {
-		return pkgBError.ParsePkgDwtErr("FuncB", err)
-	}
-
-	return nil
+	err := errors.New("执行错误")
+	nerr := a.ParseError("TestPath", err)
+	fmt.Println(nerr.BaseError())
+	fmt.Println(nerr.ShortError())
+	fmt.Println(nerr.DetailError())
+	fmt.Println(nerr.PathError())
 }
 
 // 输出的错误信息形式如：
-// pkgb.FuncB Error: Wrong B : pkga.FuncA Error: Wrong A : faild run func A
+功能测试
+内部错误
+功能测试 : 执行错误
+biandoucheng/go-error-path/test.TestPath : 功能测试
 ```

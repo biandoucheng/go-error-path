@@ -165,17 +165,15 @@ func (g *GoPathErrorType) parseError(dwt string, errs ...error) (error, error) {
 	}
 
 	berr := g.baseErr.Error()
-	berr += " : "
 
-	return fmt.Errorf("%s%s ", berr, err.Error()), fmt.Errorf("%s%s : %s ", g.pkgPath, dwt, berr)
+	return fmt.Errorf("%s%s ", berr+" : ", err.Error()), fmt.Errorf("%s%s : %s ", g.pkgPath, dwt, berr)
 }
 
 // parseItemError 格式化ErrorItem
 func (g *GoPathErrorType) parseItemError(dwt string, err ErrorItem) (error, error) {
 	berr := g.baseErr.Error()
-	berr += " : "
 
-	return fmt.Errorf("%s%s ", berr, err.DetailError()), fmt.Errorf("%s%s : %s ", g.pkgPath, dwt, err.BaseError())
+	return fmt.Errorf("%s%s ", berr+" : ", err.DetailError()), fmt.Errorf("%s%s : %s ", g.pkgPath, dwt, err.BaseError())
 }
 
 // IsNilErr 是否是空错误
