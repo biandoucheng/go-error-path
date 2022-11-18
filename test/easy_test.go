@@ -14,8 +14,12 @@ type A struct {
 
 func TestPath(t *testing.T) {
 	a := &A{}
-	a.Init(a, "功能测试")
+	a.Init(a, "功能测试", "内部错误")
 
 	err := errors.New("执行错误")
-	fmt.Println(a.ParsePathError("TestPath", err))
+	nerr := a.ParseError("TestPath", err)
+	fmt.Println(nerr.BaseError())
+	fmt.Println(nerr.ShortError())
+	fmt.Println(nerr.DetailError())
+	fmt.Println(nerr.PathError())
 }
