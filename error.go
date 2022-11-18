@@ -173,7 +173,7 @@ func (g *GoPathErrorType) parseError(dwt string, errs ...error) (error, error) {
 func (g *GoPathErrorType) parseItemError(dwt string, err ErrorItem) (error, error) {
 	berr := g.baseErr.Error()
 
-	return fmt.Errorf("%s%s ", berr+" : ", err.DetailError()), fmt.Errorf("%s%s : %s ", g.pkgPath, dwt, err.BaseError())
+	return fmt.Errorf("%s%s ", berr+" : ", err.DetailError()), fmt.Errorf("%s%s : %s : %s", g.pkgPath, dwt, g.baseErr.Error(), err.PathError().Error())
 }
 
 // IsNilErr 是否是空错误
