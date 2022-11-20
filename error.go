@@ -15,6 +15,7 @@ import (
 . ShortError  简短错误描述，用来进行对外输出，避免代码核心信息暴露
 . DetailError 是对代码中多层调用产生出错误进行按执行顺讯从里到外拼接，暴露的错误产生的完整路线
 . PathError   它是将代码执行过程中出现错误的包的基础错误与包路径层层拼接，暴露出程序的执行路径及执行出现错误的路径
+. LastError   获取最后一次记录的原始错误信息
 ..................................................................................................
 */
 type ErrorItem interface {
@@ -23,6 +24,7 @@ type ErrorItem interface {
 	ShortError() error
 	DetailError() error
 	PathError() error
+	LastError() error
 }
 
 /*
@@ -39,6 +41,7 @@ type GoPathErrorItem struct {
 	shortError  error // 对外输出错误信息
 	detailError error // 详细错误信息
 	pathError   error // 错误携带路径
+	lastError   error // 最后一个记录的原始错误
 }
 
 // IsNil 是否为空
@@ -64,6 +67,11 @@ func (e *GoPathErrorItem) DetailError() error {
 // PathError 获取包路径错误
 func (e *GoPathErrorItem) PathError() error {
 	return e.pathError
+}
+
+// LastError 获取最后一个记录的错误
+func (e *GoPathErrorItem) LastError() error {
+	return e.lastError
 }
 
 /*
@@ -120,18 +128,19 @@ func (g *GoPathErrorType) Init(err interface{}, bserr string, sherr string) {
 
 // ParseError 格式化错误
 func (g *GoPathErrorType) ParseError(dwt string, errs ...error) ErrorItem {
-	err := g.CombineErrors(errs...)
-	if err == nil {
+	lterr := g.CombineErrors(errs...)
+	if lterr == nil {
 		return nil
 	}
 
-	err, perr := g.parseError(dwt, err)
+	dter, perr := g.parseError(dwt, lterr)
 
 	return &GoPathErrorItem{
 		baseError:   g.baseErr,
 		shortError:  g.shortError,
-		detailError: err,
+		detailError: dter,
 		pathError:   perr,
+		lastError:   lterr,
 	}
 }
 
@@ -176,14 +185,9 @@ func (g *GoPathErrorType) parseItemError(dwt string, err ErrorItem) (error, erro
 	return fmt.Errorf("%s%s ", berr+" : ", err.DetailError()), fmt.Errorf("%s%s : %s : %s", g.pkgPath, dwt, g.baseErr.Error(), err.PathError().Error())
 }
 
-// IsNilErr 是否是空错误
-func (g *GoPathErrorType) IsNilErr(err ErrorItem) bool {
-	return err == nil || err.IsNil()
-}
-
 // MergeError 合并错误
 func (g *GoPathErrorType) MergeError(dwt string, err ErrorItem) ErrorItem {
-	if g.IsNilErr(err) {
+	if IsNilError(err) {
 		return nil
 	}
 
@@ -194,5 +198,17 @@ func (g *GoPathErrorType) MergeError(dwt string, err ErrorItem) ErrorItem {
 		shortError:  g.shortError,
 		detailError: dterr,
 		pathError:   perr,
+		lastError:   err.LastError(),
 	}
+}
+
+/*
+..............
+. 公共方法
+..............
+*/
+
+// 判断ErrorItem错误是否为空
+func IsNilError(err ErrorItem) bool {
+	return err == nil || err.IsNil()
 }
