@@ -175,14 +175,14 @@ func (g *GoPathErrorType) parseError(dwt string, errs ...error) (error, error) {
 
 	berr := g.baseErr.Error()
 
-	return fmt.Errorf("%s%s ", berr+" : ", err.Error()), fmt.Errorf("%s%s : %s ", g.pkgPath, dwt, berr)
+	return fmt.Errorf("%s%s ", berr+" : ", err.Error()), fmt.Errorf("%s%s : %s ", g.pkgPath, dwt, err.Error())
 }
 
 // parseItemError 格式化ErrorItem
 func (g *GoPathErrorType) parseItemError(dwt string, err ErrorItem) (error, error) {
 	berr := g.baseErr.Error()
 
-	return fmt.Errorf("%s%s ", berr+" : ", err.DetailError()), fmt.Errorf("%s%s : %s : %s", g.pkgPath, dwt, g.baseErr.Error(), err.PathError().Error())
+	return fmt.Errorf("%s%s ", berr+" : ", err.DetailError()), fmt.Errorf("%s%s : %s", g.pkgPath, dwt, err.PathError().Error())
 }
 
 // MergeError 合并错误
