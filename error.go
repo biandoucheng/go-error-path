@@ -182,7 +182,13 @@ func (g *GoPathErrorType) parseError(dwt string, errs ...error) (error, error) {
 func (g *GoPathErrorType) parseItemError(dwt string, err ErrorItem) (error, error) {
 	berr := g.baseErr.Error()
 
-	return fmt.Errorf("%s%s ", berr+" : ", err.DetailError()), fmt.Errorf("%s%s : %s", g.pkgPath, dwt, err.PathError().Error())
+	// 同包下pathErr 只取一个包路径
+	perr := err.PathError().Error()
+	if err.BaseError() == g.baseErr {
+		perr = strings.TrimLeft(perr, berr)
+	}
+
+	return fmt.Errorf("%s%s ", berr+" : ", err.DetailError()), fmt.Errorf("%s%s : %s", g.pkgPath, dwt, perr)
 }
 
 // MergeError 合并错误
